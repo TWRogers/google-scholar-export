@@ -1,14 +1,35 @@
 import requests
 from bs4 import BeautifulSoup
 
+PAPER_TEMPLATE = """
+    <div class="card">
+        <div class="card-horizontal">
+            <div class="card-body card-body-left">
+                <h4>{title}</h4>
+                <p style="font-style: italic;">by {authors}</p>
+                <p><b>{journal}</b></p>
+            </div>
+        </div>
+        <div class="card-footer">
+            <small class="text-muted">Published in <b>{year}</b> | Citations: <b>{n_citations}</b></small>
+        </div>
+    </div>
+    """
+
 
 class ScholarExporter(object):
 
-    def __init__(self, user: str) -> None:
+    def __init__(self,
+                 user: str,
+                 page_size: int = 1000,
+                 sort_by: str = 'citations') -> None:  # sort_by='pubdate'
         self.user = user
-        self.url = 'https://scholar.google.co.uk/citations?user={}'.format(self.user)
+        self.url = 'https://scholar.google.co.uk/citations?' \
+                   'user={}' \
+                   '&pagesize={}' \
+                   '&sortby={}'.format(self.user, page_size, sort_by)
         self.content = None
-        self.parsed_papers = {}
+        self.parsed_papers = []
 
     def _get_and_check_response(self):
         r = requests.get(self.url)
@@ -17,18 +38,36 @@ class ScholarExporter(object):
         else:
             raise ConnectionError('Received {} status code for url {}.'
                                   'Please check that the user {} is correct, '
-                                  'and the url format is not out of date.'.format(r.status_code, self.url, self.user))
+                                  'and the url format is not out of date.'.format(r.status_code,
+                                                                                  self.url,
+                                                                                  self.user))
 
-    def _parse_contents(self):
+    def _parse_contents(self) -> None:
         parser = BeautifulSoup(self.content, features="html.parser")
         papers = parser.body.find_all('tr', attrs={'class': 'gsc_a_tr'})
         for paper in papers:
             paper_soup = BeautifulSoup(str(paper), features="html.parser")
-            title = paper_soup.find('a').text
-            year = paper_soup.find_all('span')[-1].text
-            n_citations = paper_soup.find('a', {'class': 'gsc_a_ac gs_ibl'}).text
-            authors = paper_soup.find_all('div', {'class': 'gs_gray'})[0].text
-        raise NotImplementedError
+            this_paper = {'title': paper_soup.find('a').text,
+                          'year': paper_soup.find_all('span')[-1].text,
+                          'n_citations': paper_soup.find('a', {'class': 'gsc_a_ac gs_ibl'}).text,
+                          'authors': paper_soup.find_all('div', {'class': 'gs_gray'})[0].text,
+                          'journal': paper_soup.find_all('div', {'class': 'gs_gray'})[1].text}
+            if not this_paper['n_citations']:
+                this_paper['n_citations'] = "0"
 
-    def export(self):
+            if this_paper['journal'].endswith(', ' + this_paper['year']):
+                this_paper['journal'] = this_paper['journal'][:-len(', ' + this_paper['year'])]
+            self.parsed_papers.append(this_paper)
+
+    def export(self, html_path: str, paper_template: str = None) -> None:
         self._get_and_check_response()
+        self._parse_contents()
+        if paper_template is None:
+            paper_template = PAPER_TEMPLATE
+
+        with open(html_path, 'w') as html_file:
+            for paper in self.parsed_papers:
+                html_file.write(paper_template.format(**paper))
+
+
+
