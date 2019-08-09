@@ -1,4 +1,4 @@
-<p style="text-align: center;">
+<p align="center">
     <img src="https://twrogers.github.io/assets/images/scholar-exporter.png" width=400" title="Google Scholar Profile exporter for static html pbulication lists.">
 </p>
 
