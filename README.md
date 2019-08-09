@@ -42,7 +42,7 @@ tracking publications and citations. However, it does not have an API.
 
 There are some other libraries:
 * [dschreij/scholar_parser](https://github.com/dschreij/scholar_parser)
-* [bborrel/google-scholar-profile-parser](https://github.com/bborrel/google-scholar-profile-parser#project-rationale)
+* [bborrel/google-scholar-profile-parser](https://github.com/bborrel/google-scholar-profile-parser)
 
 However, both of these are php based, and not useful for static sites.
 
