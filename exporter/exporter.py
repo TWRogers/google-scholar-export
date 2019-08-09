@@ -107,8 +107,3 @@ class ScholarExporter(object):
                 print('Warning: error parsing paper.')
             except AttributeError:
                 print('Warning: error parsing paper.')
-
-
-
-
-
