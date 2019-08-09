@@ -29,7 +29,7 @@ The resulting html is formatted like:
 ...
 ```
 And is primarily aimed at people using Bootstrap.
-https://twrogers.github.io/projects.html#publications
+
 It is possible to modify the html for each publication by modifying `PAPER_TEMPLATE` in `./exporter/exporter.py`
 
 ## Rationale
@@ -48,7 +48,7 @@ This code can be run manually, or at website build time to update the publicatio
 Here is an example that utilises this library:
 [twrogers.github.io/projects.html](https://twrogers.github.io/projects.html#publications)
 
-The aim is eventually to develop a JS version of this library.
+The aim is eventually to develop a _JS_ version of this library.
 
 ## Requirements
 Install the relevant requirements as usual from the root of this repository:
