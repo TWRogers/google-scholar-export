@@ -68,9 +68,10 @@ class ScholarExporter(object):
             paper_template = PAPER_TEMPLATE
 
         with open(html_path, 'w') as html_file:
-            html_file.write('<p>Publications last scraped from '
-                            '<a href={url}>Google Scholar</a> on '
-                            '<b>{date}</b>.</p>'.format(url=self.url,
+            html_file.write('<p>Publications (<b>{total}</b>) last scraped from '
+                            '<a href="{url}">Google Scholar</a> on '
+                            '<b>{date}</b>.</p>'.format(total=len(self.parsed_papers),
+                                                        url=self.url,
                                                         date=date.today().isoformat()))
             for paper in self.parsed_papers:
                 html_file.write(paper_template.format(**paper))
