@@ -1,5 +1,5 @@
 ![google-scholar-export is a Python library for scraping Google scholar profiles to generate a HTML publication lists.
-](https://twrogers.github.io/assets/images/scholar-exporter.png)
+](https://twrogers.github.io/assets/images/scholar-exporter.png | width=200)
 
 # google-scholar-export
 **google-scholar-export** is a Python library for scraping Google scholar profiles to generate a HTML publication lists.
