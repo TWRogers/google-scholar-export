@@ -25,6 +25,9 @@ class ScholarExporter(object):
         for paper in papers:
             paper_soup = BeautifulSoup(str(paper), features="html.parser")
             title = paper_soup.find('a').text
+            year = paper_soup.find_all('span')[-1].text
+            n_citations = paper_soup.find('a', {'class': 'gsc_a_ac gs_ibl'}).text
+            authors = paper_soup.find_all('div', {'class': 'gs_gray'})[0].text
         raise NotImplementedError
 
     def export(self):
