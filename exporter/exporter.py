@@ -1,11 +1,14 @@
 import requests
 from bs4 import BeautifulSoup
+from urllib.parse import quote
+from datetime import date
+
 
 PAPER_TEMPLATE = """
     <div class="card">
         <div class="card-horizontal">
             <div class="card-body card-body-left">
-                <h4>{title}</h4>
+                <h4><a href="{url}">{title}</a></h4>
                 <p style="font-style: italic;">by {authors}</p>
                 <p><b>{journal}</b></p>
             </div>
@@ -31,7 +34,48 @@ class ScholarExporter(object):
         self.content = None
         self.parsed_papers = []
 
-    def _get_and_check_response(self):
+    def _parse_contents(self) -> None:
+        parser = BeautifulSoup(self.content, features="html.parser")
+        papers = parser.body.find_all('tr', attrs={'class': 'gsc_a_tr'})
+        for paper in papers:
+            paper_soup = BeautifulSoup(str(paper), features="html.parser")
+            try:
+                this_paper = {'title': paper_soup.find('a').text,
+                              'year': paper_soup.find_all('span')[-1].text,
+                              'n_citations': paper_soup.find('a', {'class': 'gsc_a_ac gs_ibl'}).text,
+                              'authors': paper_soup.find_all('div', {'class': 'gs_gray'})[0].text,
+                              'journal': paper_soup.find_all('div', {'class': 'gs_gray'})[1].text,
+                              'url': '{}#d=gs_md_cita-d&u=%2F{}'.format(self.url,
+                                                                        quote(paper_soup.find('a')['data-href'])[1:])}
+
+                if not this_paper['n_citations']:
+                    this_paper['n_citations'] = "0"
+
+                if this_paper['journal'].endswith(', ' + this_paper['year']):
+                    this_paper['journal'] = this_paper['journal'][:-len(', ' + this_paper['year'])]
+                self.parsed_papers.append(this_paper)
+            except IndexError:
+                print('Warning: error parsing paper.')
+            except AttributeError:
+                print('Warning: error parsing paper.')
+
+    def export(self,
+               html_path: str,
+               paper_template: str = None) -> None:
+        self._get_and_check_response()
+        self._parse_contents()
+        if paper_template is None:
+            paper_template = PAPER_TEMPLATE
+
+        with open(html_path, 'w') as html_file:
+            html_file.write('<p>Publications last scraped from '
+                            '<a href={url}>Google Scholar</a> on '
+                            '<b>{date}</b>.</p>'.format(url=self.url,
+                                                        date=date.today().isoformat()))
+            for paper in self.parsed_papers:
+                html_file.write(paper_template.format(**paper))
+
+    def _get_and_check_response(self) -> None:
         r = requests.get(self.url)
         if r.status_code == 200:
             self.content = r.content
@@ -42,32 +86,7 @@ class ScholarExporter(object):
                                                                                   self.url,
                                                                                   self.user))
 
-    def _parse_contents(self) -> None:
-        parser = BeautifulSoup(self.content, features="html.parser")
-        papers = parser.body.find_all('tr', attrs={'class': 'gsc_a_tr'})
-        for paper in papers:
-            paper_soup = BeautifulSoup(str(paper), features="html.parser")
-            this_paper = {'title': paper_soup.find('a').text,
-                          'year': paper_soup.find_all('span')[-1].text,
-                          'n_citations': paper_soup.find('a', {'class': 'gsc_a_ac gs_ibl'}).text,
-                          'authors': paper_soup.find_all('div', {'class': 'gs_gray'})[0].text,
-                          'journal': paper_soup.find_all('div', {'class': 'gs_gray'})[1].text}
-            if not this_paper['n_citations']:
-                this_paper['n_citations'] = "0"
 
-            if this_paper['journal'].endswith(', ' + this_paper['year']):
-                this_paper['journal'] = this_paper['journal'][:-len(', ' + this_paper['year'])]
-            self.parsed_papers.append(this_paper)
-
-    def export(self, html_path: str, paper_template: str = None) -> None:
-        self._get_and_check_response()
-        self._parse_contents()
-        if paper_template is None:
-            paper_template = PAPER_TEMPLATE
-
-        with open(html_path, 'w') as html_file:
-            for paper in self.parsed_papers:
-                html_file.write(paper_template.format(**paper))
 
 
 
