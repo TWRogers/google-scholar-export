@@ -22,17 +22,51 @@ PAPER_TEMPLATE = """
 
 class ScholarExporter(object):
 
-    def __init__(self,
-                 user: str,
-                 page_size: int = 1000,
-                 sort_by: str = 'citations') -> None:  # sort_by='pubdate'
-        self.user = user
-        self.url = 'https://scholar.google.co.uk/citations?' \
-                   'user={}' \
-                   '&pagesize={}' \
-                   '&sortby={}'.format(self.user, page_size, sort_by)
+    def __init__(self, url: str) -> None:  # sort_by='pubdate'
+        self.url = url
         self.content = None
         self.parsed_papers = []
+
+    @classmethod
+    def from_user(cls,
+                  user: str,
+                  page_size: int = 1000,
+                  sort_by: str = 'citations'):  # sort_by='pubdate'
+
+        url = 'https://scholar.google.co.uk/citations?' \
+              'user={}' \
+              '&pagesize={}' \
+              '&sortby={}'.format(user, page_size, sort_by)
+
+        return cls(url)
+
+    def export(self,
+               html_path: str,
+               paper_template: str = None) -> None:
+
+        self._get_and_check_response()
+        self._parse_contents()
+        if paper_template is None:
+            paper_template = PAPER_TEMPLATE
+
+        with open(html_path, 'w') as html_file:
+            html_file.write('<p>Publications (<b>{total}</b>) last scraped from '
+                            '<a href="{url}">Google Scholar</a> on '
+                            '<b>{date}</b>.</p>'.format(total=len(self.parsed_papers),
+                                                        url=self.url,
+                                                        date=date.today().isoformat()))
+            for paper in self.parsed_papers:
+                html_file.write(paper_template.format(**paper))
+
+    def _get_and_check_response(self) -> None:
+        r = requests.get(self.url)
+        if r.status_code == 200:
+            self.content = r.content
+        else:
+            raise ConnectionError('Received {} status code for url {}.'
+                                  'Please check that the url is valid'
+                                  'and that you have internet connection.'.format(r.status_code,
+                                                                                  self.url))
 
     def _parse_contents(self) -> None:
         parser = BeautifulSoup(self.content, features="html.parser")
@@ -58,34 +92,6 @@ class ScholarExporter(object):
                 print('Warning: error parsing paper.')
             except AttributeError:
                 print('Warning: error parsing paper.')
-
-    def export(self,
-               html_path: str,
-               paper_template: str = None) -> None:
-        self._get_and_check_response()
-        self._parse_contents()
-        if paper_template is None:
-            paper_template = PAPER_TEMPLATE
-
-        with open(html_path, 'w') as html_file:
-            html_file.write('<p>Publications (<b>{total}</b>) last scraped from '
-                            '<a href="{url}">Google Scholar</a> on '
-                            '<b>{date}</b>.</p>'.format(total=len(self.parsed_papers),
-                                                        url=self.url,
-                                                        date=date.today().isoformat()))
-            for paper in self.parsed_papers:
-                html_file.write(paper_template.format(**paper))
-
-    def _get_and_check_response(self) -> None:
-        r = requests.get(self.url)
-        if r.status_code == 200:
-            self.content = r.content
-        else:
-            raise ConnectionError('Received {} status code for url {}.'
-                                  'Please check that the user {} is correct, '
-                                  'and the url format is not out of date.'.format(r.status_code,
-                                                                                  self.url,
-                                                                                  self.user))
 
 
 
