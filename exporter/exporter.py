@@ -20,19 +20,25 @@ from datetime import date
 
 
 PAPER_TEMPLATE = """
-    <div class="card">
-        <div class="card-horizontal">
-            <div class="card-body card-body-left">
-                <h4><a href="{url}">{title}</a></h4>
-                <p style="font-style: italic;">by {authors}</p>
-                <p><b>{journal}</b></p>
-            </div>
-        </div>
-        <div class="card-footer">
-            <small class="text-muted">Published in <b>{year}</b> | Citations: <b>{n_citations}</b></small>
+<div class="card">
+    <div class="card-publication">
+        <div class="card-body card-body-left">
+            <h4><a href="{url}">{title}</a></h4>
+            <p style="font-style: italic;">by {authors}</p>
+            <p><b>{journal}</b></p>
         </div>
     </div>
-    """
+    <div class="card-footer">
+        <small class="text-muted">Published in <b>{year}</b> | 
+        <a href="{citations_url}">Citations: <b>{n_citations}</b></a></small>
+    </div>
+</div>
+"""
+
+INTRO_TEXT = """
+<p>Publications (<b>{total}</b>) last scraped for <a href="{url}">{scholar}</a> on <b>{date}</b> 
+using <a href="https://github.com/TWRogers/google-scholar-export">google-scholar-export</a>.</p>
+"""
 
 
 class ScholarExporter(object):
@@ -41,6 +47,7 @@ class ScholarExporter(object):
         self.url = url
         self.content = None
         self.parsed_papers = []
+        self.scholar = 'N/A'
 
     @classmethod
     def from_user(cls,
@@ -65,11 +72,11 @@ class ScholarExporter(object):
             paper_template = PAPER_TEMPLATE
 
         with open(html_path, 'w') as html_file:
-            html_file.write('<p>Publications (<b>{total}</b>) last scraped from '
-                            '<a href="{url}">Google Scholar</a> on '
-                            '<b>{date}</b>.</p>'.format(total=len(self.parsed_papers),
-                                                        url=self.url,
-                                                        date=date.today().isoformat()))
+            html_file.write(INTRO_TEXT.format(scholar=self.scholar,
+                                              total=len(self.parsed_papers),
+                                              url=self.url,
+                                              date=date.today().isoformat()))
+
             for paper in self.parsed_papers:
                 html_file.write(paper_template.format(**paper))
 
@@ -85,13 +92,19 @@ class ScholarExporter(object):
 
     def _parse_contents(self) -> None:
         parser = BeautifulSoup(self.content, features="html.parser")
+        self.scholar = parser.find('div', {'id': 'gsc_prf_in'}).text
         papers = parser.body.find_all('tr', attrs={'class': 'gsc_a_tr'})
         for paper in papers:
             paper_soup = BeautifulSoup(str(paper), features="html.parser")
             try:
+                citations_a = paper_soup.find('a', {'class': 'gsc_a_ac gs_ibl'})
+                if citations_a is None:
+                    citations_a = paper_soup.find('a', {'class': 'gsc_a_ac gs_ibl gsc_a_acm'})
+
                 this_paper = {'title': paper_soup.find('a').text,
                               'year': paper_soup.find_all('span')[-1].text,
-                              'n_citations': paper_soup.find('a', {'class': 'gsc_a_ac gs_ibl'}).text,
+                              'n_citations': citations_a.text,
+                              'citations_url': citations_a['href'],
                               'authors': paper_soup.find_all('div', {'class': 'gs_gray'})[0].text,
                               'journal': paper_soup.find_all('div', {'class': 'gs_gray'})[1].text,
                               'url': '{}#d=gs_md_cita-d&u=%2F{}'.format(self.url,
