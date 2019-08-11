@@ -17,9 +17,10 @@ of the following:
 
 The resulting html is formatted like:
 ```html
-<p>Publications (<b>16</b>) last scraped from <a href="https://scholar.google.co.uk/citations?user=JicYPdAAAAAJ&hl=en">Google Scholar</a> on <b>2019-08-09</b>.</p>
+<p>Publications (<b>20</b>) last scraped for <a href="https://scholar.google.co.uk/citations?user=JicYPdAAAAAJ&hl=en">Geoffrey Hinton</a> on <b>2019-08-11</b> 
+using <a href="https://github.com/TWRogers/google-scholar-export">google-scholar-export</a>.</p>
 <div class="card">
-    <div class="card-horizontal">
+    <div class="card-publication">
         <div class="card-body card-body-left">
             <h4><a href="https://scholar.google.co.uk/citations?user=JicYPdAAAAAJ&hl=en#d=gs_md_cita-d&u=%2Fcitations%3Fview_op%3Dview_citation%26hl%3Den%26oe%3DASCII%26user%3DJicYPdAAAAAJ%26citation_for_view%3DJicYPdAAAAAJ%3AGFxP56DSvIMC">Learning internal representations by error-propagation</a></h4>
             <p style="font-style: italic;">by DE Rumelhart, GE Hinton, RJ Williams</p>
@@ -27,7 +28,8 @@ The resulting html is formatted like:
         </div>
     </div>
     <div class="card-footer">
-        <small class="text-muted">Published in <b>1986</b> | Citations: <b>62219</b></small>
+        <small class="text-muted">Published in <b>1986</b> | 
+        <a href="https://scholar.google.co.uk/scholar?oi=bibs&hl=en&oe=ASCII&cites=1374659557399191249,4574189560556662535,10453698013284960354,12541410141153091507,7476519782727404507,1722523513356915749,6822548856209813074,4464353390709992638,15344233312479649775">Citations: <b>62260</b></a></small>
     </div>
 </div>
 ...
