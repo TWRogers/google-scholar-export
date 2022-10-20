@@ -106,7 +106,7 @@ class ScholarExporter(object):
 
             for paper in self.parsed_papers:
                 html_file.write(paper_template.format(**paper))
-            
+            html_file.write(END_TEXT)
 
     def _get_and_check_response(self) -> None:
         r = requests.get(self.url)
