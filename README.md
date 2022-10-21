@@ -1,6 +1,8 @@
 ## Updates
 
-1. a well rendered html templete with TailwindCSS
+![example](https://cdn.hashnode.com/res/hashnode/image/upload/v1666314008938/eGSgVKEnB.png?auto=compress,format&format=webp)
+
+1. a well rendered interactive html templete with TailwindCSS
 2. a github action script to get `html` file and push to `result` branch every day.
 3. a [blog](https://murez.cloud/how-to-show-your-google-scholar-on-hashnode) to show how to use in hashnode.
 
