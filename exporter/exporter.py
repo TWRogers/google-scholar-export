@@ -23,7 +23,7 @@ PAPER_TEMPLATE = """
     <li class="relative flex items-center justify-between rounded-xl p-4 hover:bg-slate-100">
         <div class="flex gap-4">
           <div class="w-full text-md leading-6">
-            <a href="{url}"
+            <a href="{url}" target="_blank"
                class="font-semibold text-slate-900">
                 <span class="inset-0 rounded-xl" aria-hidden="true">
                 {title}
@@ -39,10 +39,10 @@ PAPER_TEMPLATE = """
                     </p>
                 </div>
                 <div class="basis-4/12">
-                    <a class="font-medium text-slate-800">
+                    <p class="font-medium text-slate-800">
                         Published in <span class="font-bold text-slate-1000">{year}</span>
                     </p>
-                    <a class="hover:text-slate-500"  href="{citations_url}">
+                    <a class="hover:text-slate-500"  href="{citations_url}" target="_blank">
                         Citations: <span class="font-bold">{n_citations}</span>
                     </a>
                 </div>
@@ -60,7 +60,7 @@ INTRO_TEXT = """
     <p class="mx-auto max-w-lg2 bg-white p-2 shadow text-md">Publications (<span class="font-bold ">{total}</span>) last scraped for 
         <a href="{url}">
             <span class="hover:text-slate-500">{scholar}</span> </a> on <b>{date}</b> 
-        using <a href="https://github.com/murez/google-scholar-export"><span class="italic hover:text-slate-500">google-scholar-export</span></a>.</p>
+        using <a href="https://github.com/murez/google-scholar-export" target="_blank"><span class="italic hover:text-slate-500">google-scholar-export</span></a>.</p>
     <ul role="list" class="mx-auto max-w-lg2 bg-white p-2 shadow">
 """
 END_TEXT = """
