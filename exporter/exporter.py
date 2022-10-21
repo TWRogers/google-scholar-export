@@ -58,7 +58,7 @@ INTRO_TEXT = """
 
 <div class="px-4">
     <p class="mx-auto max-w-lg2 bg-white p-2 shadow text-md">Publications (<span class="font-bold ">{total}</span>) last scraped for 
-        <a href="{url}">
+        <a href="{url}" target="_blank">
             <span class="hover:text-slate-500">{scholar}</span> </a> on <b>{date}</b> 
         using <a href="https://github.com/murez/google-scholar-export" target="_blank"><span class="italic hover:text-slate-500">google-scholar-export</span></a>.</p>
     <ul role="list" class="mx-auto max-w-lg2 bg-white p-2 shadow">
