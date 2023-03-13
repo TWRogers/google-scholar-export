@@ -82,7 +82,7 @@ class ScholarExporter(object):
                   page_size: int = 1000,
                   sort_by: str = 'citations'):  # sort_by='pubdate'
 
-        url = 'https://scholar.google.co.uk/citations?' \
+        url = 'https://scholar.google.com/citations?' \
               'user={}' \
               '&pagesize={}' \
               '&sortby={}'.format(user, page_size, sort_by)
