@@ -1,3 +1,14 @@
+## Updates
+
+![example](https://cdn.hashnode.com/res/hashnode/image/upload/v1666314008938/eGSgVKEnB.png?auto=compress,format&format=webp)
+
+1. a well rendered interactive html templete with TailwindCSS
+2. a github action script to get `html` file and push to `result` branch every day.
+3. a [blog](https://murez.cloud/how-to-show-your-google-scholar-on-hashnode) to show how to use in hashnode.
+
+--------------------------
+Old README
+
 <p align="center">
     <img src="https://twrogers.github.io/assets/images/scholar-exporter.png" width=400" title="Google Scholar Profile exporter for static html pbulication lists.">
 </p>

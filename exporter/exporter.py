@@ -20,26 +20,53 @@ from datetime import date
 
 
 PAPER_TEMPLATE = """
-<div class="card">
-    <div class="card-publication">
-        <div class="card-body card-body-left">
-            <h4><a href="{url}">{title}</a></h4>
-            <p style="font-style: italic;">by {authors}</p>
-            <p><b>{journal}</b></p>
+    <li class="relative flex items-center justify-between rounded-xl p-4 hover:bg-slate-100">
+        <div class="flex gap-4">
+          <div class="w-full text-md leading-6">
+            <a href="{url}" target="_blank"
+               class="font-semibold text-slate-900">
+                <span class="inset-0 rounded-xl" aria-hidden="true">
+                {title}
+                </span>
+            </a>
+            <div class="flex">
+                <div class="basis-8/12 text-sm ">
+                    <p class="font-medium text-slate-600">
+                        by <span class="italic"> {authors}</span>
+                    </p>
+                    <p class="font-semibold text-slate-500">
+                        {journal}
+                    </p>
+                </div>
+                <div class="basis-4/12">
+                    <p class="font-medium text-slate-800">
+                        Published in <span class="font-bold text-slate-1000">{year}</span>
+                    </p>
+                    <a class="hover:text-slate-500"  href="{citations_url}" target="_blank">
+                        Citations: <span class="font-bold">{n_citations}</span>
+                    </a>
+                </div>
+            </div>
+           
+          </div>
         </div>
-    </div>
-    <div class="card-footer">
-        <small class="text-muted">Published in <b>{year}</b> | 
-        <a href="{citations_url}">Citations: <b>{n_citations}</b></a></small>
-    </div>
-</div>
+      </li>
 """
 
 INTRO_TEXT = """
-<p>Publications (<b>{total}</b>) last scraped for <a href="{url}">{scholar}</a> on <b>{date}</b> 
-using <a href="https://github.com/TWRogers/google-scholar-export">google-scholar-export</a>.</p>
-"""
+<script src="https://cdn.tailwindcss.com"></script>
 
+<div class="px-4">
+    <p class="mx-auto max-w-lg2 bg-white p-2 shadow text-md">Publications (<span class="font-bold ">{total}</span>) last scraped for 
+        <a href="{url}" target="_blank">
+            <span class="hover:text-slate-500">{scholar}</span> </a> on <b>{date}</b> 
+        using <a href="https://github.com/murez/google-scholar-export" target="_blank"><span class="italic hover:text-slate-500">google-scholar-export</span></a>.</p>
+    <ul role="list" class="mx-auto max-w-lg2 bg-white p-2 shadow">
+"""
+END_TEXT = """
+    </ul>
+</div>
+"""
 
 class ScholarExporter(object):
 
@@ -55,7 +82,7 @@ class ScholarExporter(object):
                   page_size: int = 1000,
                   sort_by: str = 'citations'):  # sort_by='pubdate'
 
-        url = 'https://scholar.google.co.uk/citations?' \
+        url = 'https://scholar.google.com/citations?' \
               'user={}' \
               '&pagesize={}' \
               '&sortby={}'.format(user, page_size, sort_by)
@@ -79,6 +106,7 @@ class ScholarExporter(object):
 
             for paper in self.parsed_papers:
                 html_file.write(paper_template.format(**paper))
+            html_file.write(END_TEXT)
 
     def _get_and_check_response(self) -> None:
         r = requests.get(self.url)
@@ -108,7 +136,7 @@ class ScholarExporter(object):
                               'authors': paper_soup.find_all('div', {'class': 'gs_gray'})[0].text,
                               'journal': paper_soup.find_all('div', {'class': 'gs_gray'})[1].text,
                               'url': '{}#d=gs_md_cita-d&u=%2F{}'.format(self.url,
-                                                                        quote(paper_soup.find('a')['data-href'])[1:])}
+                                                                        quote(paper_soup.find('a')['href'])[1:])}
 
                 if not this_paper['n_citations']:
                     this_paper['n_citations'] = "0"
